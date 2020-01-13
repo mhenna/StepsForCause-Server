@@ -2,6 +2,7 @@ package com.techdev.stepsforcause.controller;
 
 import com.techdev.stepsforcause.models.User;
 import com.techdev.stepsforcause.routes.Routes;
+import com.techdev.stepsforcause.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,17 +19,26 @@ public class UserController {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    private UserService service = new UserService();
+
+
     @RequestMapping(value = Routes.USERS, method = RequestMethod.GET)
     public List<User> getUsers() {
-        return mongoTemplate.findAll(User.class);
+        return service.getUsers(mongoTemplate);
     }
 
     @RequestMapping(value = Routes.USERS, method = RequestMethod.POST)
-    public User registerUsers(@RequestBody Map<String, Object> body) {
-        return mongoTemplate.save(new User(String.valueOf(body.get("firstName")),
-                String.valueOf(body.get("lastName")),
-                String.valueOf(body.get("email")),
-                String.valueOf(body.get("password")),
-                "kjwfhekjwfhek"));
+    public Map<String, Object> registerUsers(@RequestBody Map<String, Object> body) {
+        return service.addUser(body, mongoTemplate);
+    }
+
+    @RequestMapping(value = Routes.STEPCOUNT, method = RequestMethod.PUT)
+    public Map<String, Object> updateStepCount(@RequestBody Map<String, Object> body) {
+        return service.updateStepCount(body, mongoTemplate);
+    }
+
+    @RequestMapping(value = Routes.VERIFICATIONCODE, method = RequestMethod.PUT)
+    public Map<String, Object> updateVerificationCode(@RequestBody Map<String, Object> body) {
+        return service.updateVerificationCode(body, mongoTemplate);
     }
 }
