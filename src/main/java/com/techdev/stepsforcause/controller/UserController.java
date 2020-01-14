@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -55,7 +54,7 @@ public class UserController {
     }
 
     @RequestMapping(value = Routes.VERIFICATIONCODE, method = RequestMethod.PUT)
-    public Map<String, Object> updateVerificationCode(@RequestBody Map<String, Object> body) {
+    public ResponseEntity updateVerificationCode(@RequestBody Map<String, Object> body) {
         Map<String, Object> userAndQuery = service.getUserAndQuery(body, mongoTemplate);
 
         User user = (User) userAndQuery.get("user");
