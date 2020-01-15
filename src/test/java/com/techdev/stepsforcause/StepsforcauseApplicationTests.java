@@ -2,6 +2,8 @@ package com.techdev.stepsforcause;
 
 import com.techdev.stepsforcause.controller.UserController;
 import com.techdev.stepsforcause.models.User;
+import com.techdev.stepsforcause.routes.Routes;
+import com.techdev.stepsforcause.utils.JwtToken;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,7 +23,7 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(properties = {"spring.data.mongodb.database=steps-for-cause-test"})
+@SpringBootTest(properties = {"spring.data.mongodb.database=steps-for-cause-test", "spring.data.mongodb.uri=mongodb://localhost:27017"})
 @AutoConfigureMockMvc
 class StepsforcauseApplicationTests {
 
@@ -31,11 +33,15 @@ class StepsforcauseApplicationTests {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Autowired
+    private JwtToken jwtToken;
+
     @InjectMocks
     private UserController userController;
 
     private User youssef = new User("youssef", "elhady", "youssef@emc.com", "hello", "");
     private User mostafa = new User("mostafa", "henna", "mostafa@emc.com", "hello", "");
+
     @Test
     void contextLoads() throws Exception {
         assertThat(userController).isNotNull();
@@ -47,7 +53,7 @@ class StepsforcauseApplicationTests {
 
     @Test
     public void getUsersShouldReturnUsers() throws Exception {
-        mockMvc.perform(get("/users"))
+        mockMvc.perform(get("/" + Routes.USERS))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.users", hasSize(2)))
@@ -62,7 +68,7 @@ class StepsforcauseApplicationTests {
     @Test
     public void testRegister() throws Exception {
         User u = new User("karim", "mady", "karim@emc.com", "hello", "");
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/" + Routes.USERS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karim@emc.com\", \"password\": \"hello\"}")
                 .accept(MediaType.APPLICATION_JSON))
@@ -80,7 +86,7 @@ class StepsforcauseApplicationTests {
         Assert.assertEquals("mady", retrievedUser.lastName);
         Assert.assertEquals("karim@emc.com", retrievedUser.email);
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/" + Routes.USERS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karim@emc.com\", \"password\": \"hello\"}")
                 .accept(MediaType.APPLICATION_JSON))
@@ -88,25 +94,25 @@ class StepsforcauseApplicationTests {
 
         mongoTemplate.remove(retrievedUser);
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/" + Routes.USERS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"firstName\": \"\", \"lastName\": \"mady\", \"email\":\"karim@emc.com\", \"password\": \"hello\"}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/" + Routes.USERS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"firstName\": \"karim\", \"lastName\": \"\", \"email\":\"karim@emc.com\", \"password\": \"hello\"}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/" + Routes.USERS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karim@emc.com\", \"password\": \"\"}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/" + Routes.USERS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karimemc.com\", \"password\": \"hello\"}")
                 .accept(MediaType.APPLICATION_JSON))
@@ -114,28 +120,65 @@ class StepsforcauseApplicationTests {
     }
 
     @Test
+    public void testLogin() throws Exception {
+        mockMvc.perform(post("/" + Routes.USERS + Routes.LOGIN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\": \"youssef@emc.com\", \"password\": \"hello\"}")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/" + Routes.USERS + Routes.LOGIN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\": \"youef@emc.com\", \"password\": \"hello\"}")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(post("/" + Routes.USERS + Routes.LOGIN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\": \"youssef@emc.com\", \"password\": \"heo\"}")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void testUpdateStepCount() throws Exception {
-        mockMvc.perform(put("/stepCount")
+        String token = jwtToken.generateToken(youssef);
+        mockMvc.perform(put("/" + Routes.STEPCOUNT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"email\": \"youssef@emc.com\", \"stepCount\": \"2000\"}")
+                .header("authorization", "Bearer " + token)
                 .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.user", hasValue(youssef.firstName)))
                     .andExpect(jsonPath("$.user", hasValue(youssef.lastName)))
                     .andExpect(jsonPath("$.user", hasValue(youssef.email)))
                     .andExpect(jsonPath("$.user", hasValue(2000)));
+
+        mockMvc.perform(put("/" + Routes.STEPCOUNT)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\": \"youssef@emc.com\", \"stepCount\": \"2000\"}")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void testUpdateVerificationCode() throws Exception {
-        mockMvc.perform(put("/verificationCode")
+        String token = jwtToken.generateToken(youssef);
+        mockMvc.perform(put("/" + Routes.VERIFICATIONCODE)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"email\": \"youssef@emc.com\", \"verificationCode\": \"updated code\"}")
+                .header("authorization", "Bearer " + token)
                 .accept(MediaType.APPLICATION_JSON))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.user", hasValue(youssef.firstName)))
                     .andExpect(jsonPath("$.user", hasValue(youssef.lastName)))
                     .andExpect(jsonPath("$.user", hasValue(youssef.email)))
                     .andExpect(jsonPath("$.user", hasValue("updated code")));
+
+        mockMvc.perform(put("/" + Routes.VERIFICATIONCODE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\": \"youssef@emc.com\", \"verificationCode\": \"updated code\"}")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized());
     }
 }
