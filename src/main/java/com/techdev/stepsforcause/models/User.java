@@ -1,5 +1,6 @@
 package com.techdev.stepsforcause.models;
 
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -39,6 +40,8 @@ public class User {
 
     public String verificationCode;
 
+    public Boolean isVerified;
+
     public User() {}
 
     public User(String fn, String ln, String email, String password, String verificationCode) {
@@ -48,41 +51,10 @@ public class User {
         this.password = password;
         this.verificationCode = verificationCode;
         this.stepCount = 0;
+        this.isVerified = false;
     }
 
-    public ResponseEntity updateStepCount(MongoTemplate mongoTemplate, Integer stepCount, Query q) {
-        Map<String, Object> res = new HashMap<>();
-        HttpStatus status = null;
-        try {
-            Update update = new Update();
-            update.set(UserAttributes.STEPCOUNT, stepCount);
-            User u = mongoTemplate.findAndModify(q, update, new FindAndModifyOptions().returnNew(true), User.class);
-            res.put("user", u);
-            status = HttpStatus.OK;
-        } catch (Exception e) {
-            res.put("error", e.getMessage());
-            status = HttpStatus.BAD_REQUEST;
-        }
 
-        return new ResponseEntity(res, status);
-    }
-
-    public ResponseEntity updateVerificationCode(MongoTemplate mongoTemplate, String verificationCode, Query q) {
-        Map<String, Object> res = new HashMap<>();
-        HttpStatus status = null;
-        try {
-            Update update = new Update();
-            update.set(UserAttributes.VERIFICATIONCODE, verificationCode);
-            User u = mongoTemplate.findAndModify(q, update, new FindAndModifyOptions().returnNew(true), User.class);
-            res.put("user", u);
-            status = HttpStatus.OK;
-        } catch (Exception e) {
-            res.put("error", e.getMessage());
-            status = HttpStatus.BAD_REQUEST;
-        }
-
-        return new ResponseEntity(res, status);
-    }
 
     public String toString() {
         return String.format(
