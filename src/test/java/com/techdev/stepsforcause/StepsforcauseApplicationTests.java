@@ -1,17 +1,13 @@
 package com.techdev.stepsforcause;
 
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.techdev.stepsforcause.controller.UserController;
 import com.techdev.stepsforcause.models.User;
 import com.techdev.stepsforcause.routes.Routes;
 import com.techdev.stepsforcause.utils.HelperFuncs;
 import com.techdev.stepsforcause.utils.JwtToken;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
