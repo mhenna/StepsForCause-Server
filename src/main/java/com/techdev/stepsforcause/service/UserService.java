@@ -1,23 +1,18 @@
 package com.techdev.stepsforcause.service;
 
-import ch.qos.logback.core.encoder.EchoEncoder;
 import com.techdev.stepsforcause.models.User;
 import com.techdev.stepsforcause.models.UserAttributes;
 import com.techdev.stepsforcause.utils.HelperFuncs;
 import com.techdev.stepsforcause.utils.JwtToken;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

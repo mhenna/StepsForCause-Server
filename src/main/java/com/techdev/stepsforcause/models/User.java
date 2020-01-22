@@ -1,21 +1,11 @@
 package com.techdev.stepsforcause.models;
 
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.FindAndModifyOptions;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Document(collection = "user")
 public class User {
