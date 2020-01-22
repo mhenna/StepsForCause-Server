@@ -3,35 +3,28 @@ package com.techdev.stepsforcause;
 import com.techdev.stepsforcause.controller.UserController;
 import com.techdev.stepsforcause.models.User;
 import com.techdev.stepsforcause.routes.Routes;
-import com.techdev.stepsforcause.service.UserService;
 import com.techdev.stepsforcause.utils.HelperFuncs;
 import com.techdev.stepsforcause.utils.JwtToken;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
-import org.mockito.internal.configuration.injection.MockInjection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.MediaType;
-import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasValue;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -49,7 +42,10 @@ class StepsforcauseApplicationTests {
     @Autowired
     private JwtToken jwtToken;
 
-    @InjectMocks
+    @MockBean
+    HelperFuncs helperFuncs;
+
+    @Autowired
     private UserController userController;
 
     private User youssef = new User("youssef", "elhady", "youssef@emc.com", "hello", "hi");
@@ -59,6 +55,7 @@ class StepsforcauseApplicationTests {
     void setupDB() {
         MockitoAnnotations.initMocks(this);
         mongoTemplate.dropCollection(User.class);
+        mongoTemplate.indexOps(User.class).ensureIndex(new Index().on("email", Sort.Direction.ASC).unique());
         mongoTemplate.save(youssef);
         mongoTemplate.save(mostafa);
     }
@@ -97,11 +94,13 @@ class StepsforcauseApplicationTests {
         3. Register with no last name
         4. Register with no password
         5. Register with an incorrectly formatted email
+        6. Register again to ensure duplicate key error returns
      */
     @Test
     public void testRegister() throws Exception {
-        User u = new User("karim", "mady", "karim@karim.com", "hello", "");
+        doNothing().when(helperFuncs).sendEmail(anyString(), anyString(), anyString(), anyString());
 
+        User u = new User("karim", "mady", "karim@karim.com", "hello", "");
         mockMvc.perform(post("/" + Routes.USERS)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karim@karim.com\", \"password\": \"hello\"}")
@@ -143,6 +142,12 @@ class StepsforcauseApplicationTests {
                 .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karimkarim.com\", \"password\": \"hello\"}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/" + Routes.USERS)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karim@karim.com\", \"password\": \"hello\"}")
+                .accept(MediaType.APPLICATION_JSON))
+                    .andExpect(status().isBadRequest());
 
         mongoTemplate.remove(retrievedUser);
     }
