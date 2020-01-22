@@ -64,7 +64,7 @@ class StepsforcauseApplicationTests {
     }
 
     @Test
-    void acontextLoads() throws Exception {
+    void contextLoads() throws Exception {
         assertThat(userController).isNotNull();
     }
 
@@ -73,7 +73,7 @@ class StepsforcauseApplicationTests {
         2. Get users without token to make sure it will return unauthorized
      */
     @Test
-    public void btestGetUsers() throws Exception {
+    public void testGetUsers() throws Exception {
         String token = jwtToken.generateToken(youssef);
         mockMvc.perform(get("/" + Routes.USERS)
                 .header("authorization", "Bearer " + token))
@@ -99,7 +99,7 @@ class StepsforcauseApplicationTests {
         5. Register with an incorrectly formatted email
      */
     @Test
-    public void ctestRegister() throws Exception {
+    public void testRegister() throws Exception {
         User u = new User("karim", "mady", "karim@karim.com", "hello", "");
 
         mockMvc.perform(post("/" + Routes.USERS)
@@ -155,7 +155,7 @@ class StepsforcauseApplicationTests {
         5. Logging in with incorrect password
         6. Logging in correctly */
     @Test
-    public void etestCheckVerificationCode() throws Exception {
+    public void testCheckVerificationCode() throws Exception {
         //////////////////// Login before verification ///////////////////////////
         mockMvc.perform(post("/" + Routes.USERS + Routes.LOGIN)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -209,7 +209,7 @@ class StepsforcauseApplicationTests {
         2. Update step count without token to make sure it will return unauthorized
      */
     @Test
-    public void gtestUpdateStepCount() throws Exception {
+    public void testUpdateStepCount() throws Exception {
         String token = jwtToken.generateToken(youssef);
         mockMvc.perform(put("/" + Routes.STEPCOUNT)
                 .contentType(MediaType.APPLICATION_JSON)

@@ -50,7 +50,6 @@ public class UserService {
                     String.valueOf(body.get(UserAttributes.PASSWORD)),
                     verificationCode));
 
-
             String emailBody = "Please use this verification code to verify your email is correct in order to be " +
                     "able to log in to StepsForCause.\n" + verificationCode;
 
