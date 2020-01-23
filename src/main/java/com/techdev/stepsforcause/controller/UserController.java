@@ -57,6 +57,17 @@ public class UserController {
         return responseEntity;
     }
 
+    @RequestMapping(value = Routes.USERS + Routes.IMAGE, method = RequestMethod.PUT)
+    public ResponseEntity updateUserImage(@RequestBody Map<String, Object> body) {
+        ResponseEntity responseEntity;
+        if (service.getHelperFuncs().userAuthenticated(request, jwtTokenUtil))
+            responseEntity = service.updateImage(body);
+        else
+            responseEntity = service.getHelperFuncs().unathorizedTemplate();
+
+        return responseEntity;
+    }
+
     @RequestMapping(value = Routes.VERIFICATIONCODE, method = RequestMethod.POST)
     public ResponseEntity checkVerificationCode(@RequestBody Map<String, Object> body) {
         ResponseEntity responseEntity;

@@ -9,4 +9,5 @@ public class UserAttributes {
     public static final String STEPCOUNT = "stepCount";
     public static final String VERIFICATIONCODE = "verificationCode";
     public static final String ISVERIFIED = "isVerified";
+    public static final String IMAGE = "image";
 }
