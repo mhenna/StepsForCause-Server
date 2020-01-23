@@ -48,7 +48,7 @@ public class UserService {
                     String.valueOf(body.get(UserAttributes.LASTNAME)),
                     String.valueOf(body.get(UserAttributes.EMAIL)),
                     String.valueOf(body.get(UserAttributes.PASSWORD)),
-                    verificationCode));
+                    verificationCode, String.valueOf(body.get(UserAttributes.IMAGE))));
 
             String emailBody = "Please use this verification code to verify your email is correct in order to be " +
                     "able to log in to StepsForCause.\n" + verificationCode;
@@ -148,6 +148,26 @@ public class UserService {
         try {
             Update update = new Update();
             update.set(UserAttributes.STEPCOUNT, stepCount);
+            User u = mongoTemplate.findAndModify(q, update, new FindAndModifyOptions().returnNew(true), User.class);
+            res.put("user", u);
+            status = HttpStatus.OK;
+        } catch (Exception e) {
+            res.put("error", e.getMessage());
+            status = HttpStatus.BAD_REQUEST;
+        }
+
+        return new ResponseEntity(res, status);
+    }
+
+    public ResponseEntity updateImage(Map<String, Object> body) {
+        Map<String, Object> userAndQuery = getUserAndQuery(body);
+        Query q = (Query) userAndQuery.get("query");
+        String image = String.valueOf(body.get(UserAttributes.IMAGE));
+        Map<String, Object> res = new HashMap<>();
+        HttpStatus status = null;
+        try {
+            Update update = new Update();
+            update.set(UserAttributes.IMAGE, image);
             User u = mongoTemplate.findAndModify(q, update, new FindAndModifyOptions().returnNew(true), User.class);
             res.put("user", u);
             status = HttpStatus.OK;

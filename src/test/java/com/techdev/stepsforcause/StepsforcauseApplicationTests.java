@@ -50,8 +50,8 @@ class StepsforcauseApplicationTests {
     @Autowired
     private UserController userController;
 
-    private User youssef = new User("youssef", "elhady", "youssef@emc.com", "hello", "hi");
-    private User mostafa = new User("mostafa", "henna", "mostafa@emc.com", "hello", "");
+    private User youssef = new User("youssef", "elhady", "youssef@emc.com", "hello", "hi", "");
+    private User mostafa = new User("mostafa", "henna", "mostafa@emc.com", "hello", "", "");
 
     @BeforeEach
     void setupDB() {
@@ -190,8 +190,8 @@ class RegistrationTests {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    private User youssef = new User("youssef", "elhady", "youssef@emc.com", "hello", "hi");
-    private User mostafa = new User("mostafa", "henna", "mostafa@emc.com", "hello", "");
+    private User youssef = new User("youssef", "elhady", "youssef@emc.com", "hello", "hi", "");
+    private User mostafa = new User("mostafa", "henna", "mostafa@emc.com", "hello", "", "");
 
     @BeforeEach
     void setupDB() {
@@ -214,10 +214,10 @@ class RegistrationTests {
     public void testRegister() throws Exception {
         doNothing().when(helperFuncs).sendEmail(anyString(), anyString(), anyString(), anyString());
 
-        User u = new User("karim", "mady", "karim@karim.com", "hello", "");
+        User u = new User("karim", "mady", "karim@karim.com", "hello", "", "");
         mockMvc.perform(post("/" + Routes.USERS)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karim@karim.com\", \"password\": \"hello\"}")
+                .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karim@karim.com\", \"password\": \"hello\", \"image\":\"wdefd\"}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.user", hasValue(u.firstName)))
@@ -235,31 +235,31 @@ class RegistrationTests {
 
         mockMvc.perform(post("/" + Routes.USERS)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"firstName\": \"\", \"lastName\": \"mady\", \"email\":\"karim@karim.com\", \"password\": \"hello\"}")
+                .content("{\"firstName\": \"\", \"lastName\": \"mady\", \"email\":\"karim@karim.com\", \"password\": \"hello\", \"image\":\"wdefd\"}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
         mockMvc.perform(post("/" + Routes.USERS)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"firstName\": \"karim\", \"lastName\": \"\", \"email\":\"karim@karim.com\", \"password\": \"hello\"}")
+                .content("{\"firstName\": \"karim\", \"lastName\": \"\", \"email\":\"karim@karim.com\", \"password\": \"hello\", \"image\":\"wdefd\"}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
         mockMvc.perform(post("/" + Routes.USERS)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karim@karim.com\", \"password\": \"\"}")
+                .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karim@karim.com\", \"password\": \"\", \"image\":\"wdefd\"}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
         mockMvc.perform(post("/" + Routes.USERS)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karimkarim.com\", \"password\": \"hello\"}")
+                .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karimkarim.com\", \"password\": \"hello\", \"image\":\"wdefd\"}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
         mockMvc.perform(post("/" + Routes.USERS)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karim@karim.com\", \"password\": \"hello\"}")
+                .content("{\"firstName\": \"karim\", \"lastName\": \"mady\", \"email\":\"karim@karim.com\", \"password\": \"hello\", \"image\":\"wdefd\"}")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 

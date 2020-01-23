@@ -32,9 +32,11 @@ public class User {
 
     public Boolean isVerified;
 
+    public String image;
+
     public User() {}
 
-    public User(String fn, String ln, String email, String password, String verificationCode) {
+    public User(String fn, String ln, String email, String password, String verificationCode, String image) {
         this.firstName = fn;
         this.lastName = ln;
         this.email = email;
@@ -42,9 +44,8 @@ public class User {
         this.verificationCode = verificationCode;
         this.stepCount = 0;
         this.isVerified = false;
+        this.image = image;
     }
-
-
 
     public String toString() {
         return String.format(
