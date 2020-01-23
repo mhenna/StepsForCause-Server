@@ -8,4 +8,5 @@ public class UserAttributes {
     public static final String PASSWORD = "password";
     public static final String STEPCOUNT = "stepCount";
     public static final String VERIFICATIONCODE = "verificationCode";
+    public static final String ISVERIFIED = "isVerified";
 }
