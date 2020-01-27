@@ -36,6 +36,18 @@ public class UserController {
         return responseEntity;
     }
 
+    @RequestMapping(value = Routes.USERS + Routes.USER, method = RequestMethod.GET)
+    public ResponseEntity getUser() {
+        ResponseEntity responseEntity;
+        if (service.getHelperFuncs().userAuthenticated(request, jwtTokenUtil)) {
+            responseEntity = service.getUser(jwtTokenUtil, request);
+        }
+        else
+            responseEntity = service.getHelperFuncs().unathorizedTemplate();
+
+        return responseEntity;
+    }
+
     @RequestMapping(value = Routes.USERS, method = RequestMethod.POST)
     public ResponseEntity registerUsers(@RequestBody Map<String, Object> body) {
         return service.addUser(body);

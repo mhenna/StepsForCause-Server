@@ -12,7 +12,10 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import com.techdev.stepsforcause.utils.JwtToken;
 
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +40,31 @@ public class UserService {
         List<User> users = mongoTemplate.findAll(User.class);
         res.put("users", users);
         return new ResponseEntity(res, HttpStatus.OK);
+    }
+
+    public ResponseEntity getUser(JwtToken jwt, HttpServletRequest request) {
+        String token = jwt.resolveToken(request);
+        Map<String, Object> res = new HashMap<>();
+        HttpStatus status = null;
+
+        try{
+            Query query = new Query(where(UserAttributes.EMAIL).is(String.valueOf(jwt.getEmailFromToken(token))));
+            User u = mongoTemplate.findOne(query, User.class);
+
+            if (u == null) {
+                res.put("error", "Could not find user with this email!");
+                status = HttpStatus.NOT_FOUND;
+            } else {
+                res.put("user", u);
+                status = HttpStatus.OK;
+            }
+        }catch(Exception e){
+            res.put("error", e.getMessage());
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+
+        return new ResponseEntity(res, status);
     }
 
     public ResponseEntity addUser(Map<String, Object> body) {
