@@ -89,6 +89,21 @@ class StepsforcauseApplicationTests {
                 .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    public void testGetUser() throws Exception {
+        String token = jwtToken.generateToken(youssef);
+        mockMvc.perform(get("/" + Routes.USERS + Routes.USER)
+                .header("authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.user.firstName", is("youssef")))
+                .andExpect(jsonPath("$.user.lastName", is("elhady")))
+                .andExpect(jsonPath("$.user.email", is("youssef@emc.com")));
+
+        mockMvc.perform(get("/" + Routes.USERS + Routes.USER))
+                .andExpect(status().isUnauthorized());
+    }
+
     /* This is the part where verification along with login endpoints are tested
         1. Logging in before user verification is complete
         2. Entering incorrect verificationCode
