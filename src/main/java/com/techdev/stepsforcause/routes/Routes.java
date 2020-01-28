@@ -7,4 +7,5 @@ public class Routes {
     public static final String VERIFICATIONCODE = "verificationCode";
     public static final String IMAGE = "/image";
     public static final String LOGIN = "/login";
+    public static final String USER = "/user";
 }
